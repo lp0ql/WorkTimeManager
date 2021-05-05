@@ -107,22 +107,20 @@
                     elements.counter.innerText = min + " : " + sec;
                     document.title = elements.counter.innerText + " 　" + elements.status.innerText;
                 };
+                display(s);
 
-                function count(s){
-                    display(s);
+                var counted = 0;
+                var interval = setInterval(function(){
+                    counted++;
+                    display(s-counted);
+                    if(s - counted < 1 ){
+                        clearInterval(interval);
+                        resolve();
+                    };
+                },1000);
 
-                    setTimeout(function(){
-                        
-                        if(s < 1){
-                            resolve();
-                        }else{
-                            s--;
-                            count(s);
-                        };
-                    },1000);
-                };
 
-                count(s);
+
             })
         };
 
