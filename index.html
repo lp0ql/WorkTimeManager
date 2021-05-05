@@ -9,6 +9,7 @@
 <body>
     <div id="counter">??:??</div>
     <div id="status">JavaScript待機中</div>
+    <div id="reset">リセット</div>
     <style>
         body{
             background-color: yellowgreen;
@@ -35,6 +36,21 @@
             display:flex;
             justify-content: center;
             align-items: center;
+        }
+        #reset{
+            position: fixed;
+            right: 1%;
+            width: auto;
+            font-size: 4vmin;
+            border:solid 1px;
+            cursor: pointer;
+            padding: 0.5%;
+            background-color: rgb(127.5,127.5,127.5,0);
+            opacity: 0.5;
+        }
+        #reset:hover{
+            background-color: rgb(127.5,127.5,127.5,0.5);
+            opacity: 1;
         }
     </style>
     <script>
@@ -109,14 +125,23 @@
                 };
                 display(s);
 
-                var counted = 0;
+                let start_date = Date.now();
+
+                if(localStorage.start_date){//ローカルストレージにデータがある場合復元
+                    start_date = new Date(JSON.parse(localStorage.start_date));
+                };
+
+                
+                localStorage.start_date = JSON.stringify(start_date);//ローカルストレージにデータを保存
+
                 var interval = setInterval(function(){
-                    counted++;
-                    display(s-counted);
-                    if(s - counted < 1 ){
+                    var elapsed = Math.floor( Math.abs(start_date - Date.now())/1000);
+                    if(elapsed>s){
                         clearInterval(interval);
+                        delete localStorage.start_date;
                         resolve();
                     };
+                    display(s-elapsed);
                 },1000);
 
 
@@ -126,6 +151,7 @@
 
 
         function start_break_time(){
+            localStorage.process = "start_break_time";
             elements.status.innerText = "休憩時間";
 
             counter(time_settings.break/2).then(() => {
@@ -134,6 +160,7 @@
         };
 
         function main_time(){
+            localStorage.process = "main_time";
             elements.status.innerText = "作業時間";
             document.body.animate([
                 {
@@ -154,6 +181,7 @@
         };
 
         function save_time(){
+            localStorage.process = "save_time";
             elements.status.innerText = "整理時間";
             document.body.animate([
                 {
@@ -173,6 +201,8 @@
         };
 
         function end_break_time(){
+            localStorage.process = "end_break_time";
+
             elements.status.innerText = "休憩時間";
             document.body.animate([
                 {
@@ -187,9 +217,12 @@
 
 
             setTimeout(function(){
+                delete localStorage.start_date;
+                delete localStorage.process;
                 window.location.reload();
             },time_settings.break/2*1000);
 
+            
             counter(time_settings.break);
 
             coeFontStudio.play("break");
@@ -197,12 +230,58 @@
         };
 
 
-        start_break_time(time_settings.break);
+
+        //ローカルに情報があれば続きから、なければ最初から
+        (function(){
+            const local_process = localStorage.process;
+
+            if(local_process == "main_time"){
+                main_time();
+            }else if(local_process == "save_time"){
+                save_time();
+            }else if(local_process == "end_break_time"){
+                end_break_time();
+            }else{
+                start_break_time();
+            };
+        })();
+
 
         //ブラウザの音声再生許可表示用
         (function(){
             new Audio("./voice/test.wav").play();
         })();
+
+
+        //リセットの処理
+        (function(){
+            document.getElementById("reset").onclick = function(){
+                const reset_element = document.getElementById("reset");
+                reset_element.innerText = "トリプルクリックでリセット";
+                setTimeout(function(){
+                    reset_element.innerText = "リセット";
+                },5000);
+
+                if(reset_element.dataset.click && reset_element.dataset.click == "2"){
+                    delete localStorage.process;
+                    delete localStorage.start_date;
+                    window.location.reload();
+                }else{
+                    var now = reset_element.dataset.click;
+                    if(!now){
+                        now = "0";
+                    };
+                    now = Number(now) + 1;
+                    reset_element.dataset.click = String(now);
+
+                    setTimeout(function(){
+                        reset_element.dataset.click = "0";
+                    },1000);
+
+                }
+
+            }
+        })()
 
 
 
