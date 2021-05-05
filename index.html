@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作業時間</title>
+</head>
+<body>
+    <div id="counter">??:??</div>
+    <div id="status">JavaScript待機中</div>
+    <style>
+        body{
+            background-color: yellowgreen;
+            color: black;
+        }
+        #counter{
+            position: fixed;
+            left: 0%;
+            top: 0%;
+            width: 100%;
+            height: 90%;
+            font-size: 5vmin;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #status{
+            position: fixed;
+            left: 0%;
+            top: 90%;
+            width: 100%;
+            height: 5%;
+            font-size: 5vmin;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <script>
+        let time_settings = {
+            break:600,
+            work:3000,
+            save:300
+        };
+
+        function localStorageCheck(data_type){
+            if(localStorage[data_type]){
+                time_settings[data_type] = Number(localStorage[data_type]);
+            }else{
+                localStorage[data_type] = String(time_settings[data_type]);
+            };
+        };
+
+        localStorageCheck("break");
+        localStorageCheck("work");
+        localStorageCheck("save");
+
+
+
+        const elements = {
+            counter:document.getElementById("counter"),
+            status:document.getElementById("status")
+        };
+
+        const coeFontStudio = {
+            audios:{
+                work:new Audio("./voice/work.wav"),
+                save:new Audio("./voice/save.wav"),
+                break:new Audio("./voice/break.wav")
+            },
+            show:function(){
+                const coeFontStudioText = "Voiced by https://CoeFont.studio";
+                const beforeText = elements.status.innerText;
+                elements.status.innerText = coeFontStudioText;
+                setTimeout(function(){
+                    if(elements.status.innerText == coeFontStudioText){
+                        elements.status.innerText = beforeText;
+                    };
+                },5000);
+
+            },
+            play:function(voice_type){
+                coeFontStudio.audios[voice_type].play();
+                coeFontStudio.show();
+            }
+        }
+
+        //カウントを開始
+        function counter(s){
+            return new Promise((resolve) => {
+                //画面に時間を表示
+                function display(s){
+                    var min = s % 3600 / 60 | 0;
+                    var sec = s % 60;
+                    //1桁の数字を2桁にする
+                    function add_zero(num){
+                        num = String(num);
+                        if(num.length == 1){
+                            num = "0" + num;
+                        };
+                        return num;
+                    };
+
+                    min = add_zero(min);
+                    sec = add_zero(sec);
+                    elements.counter.innerText = min + " : " + sec;
+                };
+
+                function count(s){
+                    display(s);
+
+                    setTimeout(function(){
+                        
+                        if(s == 0){
+                            resolve();
+                        }else{
+                            s--;
+                            count(s);
+                        };
+                    },1000);
+                };
+
+                count(s);
+            })
+        };
+
+
+        function start_break_time(){
+            elements.status.innerText = "休憩時間";
+
+            counter(time_settings.break/2).then(() => {
+                main_time();
+            })
+        };
+
+        function main_time(){
+            elements.status.innerText = "作業時間";
+            document.body.animate([
+                {
+                    backgroundColor:"black",
+                    color:"white"
+                }
+            ],{
+                duration:1000,
+                easing:"ease",
+                fill:"both"
+            });
+
+            counter(time_settings.work).then(() => {
+                save_time();
+            });
+            
+            coeFontStudio.play("work");
+        };
+
+        function save_time(){
+            elements.status.innerText = "整理時間";
+            document.body.animate([
+                {
+                    backgroundColor:"darkorange",
+                    color:"black"
+                }
+            ],{
+                duration:1000,
+                easing:"ease",
+                fill:"both"
+            });
+
+            counter(time_settings.save).then(() => {
+                end_break_time();
+            });
+            coeFontStudio.play("save");
+        };
+
+        function end_break_time(){
+            elements.status.innerText = "休憩時間";
+            document.body.animate([
+                {
+                    backgroundColor:"yellowgreen",
+                    color:"black"
+                }
+            ],{
+                duration:1000,
+                easing:"ease",
+                fill:"both"
+            });
+
+
+            setTimeout(function(){
+                window.location.reload();
+            },time_settings.break/2*1000);
+
+            counter(time_settings.break);
+
+            coeFontStudio.play("break");
+
+        };
+
+        start_break_time(time_settings.break);
+
+
+
+
+
+
+    </script>
+</body>
+</html>
