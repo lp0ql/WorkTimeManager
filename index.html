@@ -74,7 +74,8 @@
         let time_settings = {
             break:600,
             work:3000,
-            save:300
+            save:300,
+            autoReset:3600
         };
 
         function localStorageCheck(data_type){
@@ -98,6 +99,30 @@
         localStorageCheck("break");
         localStorageCheck("work");
         localStorageCheck("save");
+        localStorageCheck("autoReset");
+
+        //autoResetの設定
+        (function(){
+            if(localStorage.last_use){
+                const last_use_date = JSON.parse(localStorage.last_use);
+
+                var elapsed = Math.floor( Math.abs(last_use_date - Date.now())/1000);
+             
+                if(elapsed > time_settings.autoReset){
+                    //リセット処理
+                    delete localStorage.process;
+                    delete localStorage.start_date;
+                };
+            };
+
+
+            //最終使用日時を１分毎に更新
+            setInterval(function(){
+                localStorage.last_use = JSON.stringify(Date.now());
+            },60000);
+            localStorage.last_use = JSON.stringify(Date.now());
+
+        })();
 
 
 

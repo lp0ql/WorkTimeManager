@@ -14,12 +14,18 @@
     <label for="break">休憩時間（分）</label>
     <input type="number" id='break' class="text">
     <br>
+    <br>
     <div style="font-size: 2.5vmin;">※作業時間は5分以下に設定できません。</div>
     <label for="work">作業時間（分）</label>
     <input type="number" id='work' class="text">
     <br>
+    <br>
     <label for="save">整理時間（分）</label>
     <input type="number" id='save' class="text">
+    <br>
+    <br>
+    <label for="autoReset">?分以上使用しない時間が続いた場合、前回のタイマーを復元しない（分）</label>
+    <input type="number" id='autoReset' class="text">
    
     <style>
         body{
@@ -39,6 +45,7 @@
         setDefault("break");
         setDefault("work");
         setDefault("save");
+        setDefault("autoReset");
 
         //イベントを設定
         function setEvent(data_type){
@@ -49,6 +56,7 @@
         setEvent("break");
         setEvent("work");
         setEvent("save");
+        setEvent("autoReset");
 
         //戻るボタンの設定
         (function(){
