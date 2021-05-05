@@ -1,6 +1,8 @@
 # WorkTimeManager
 作業時間を管理する為のページです。
 
+# [WorkTimeManagerを開く](https://lp0ql.github.io/WorkTimeManager/)
+
 ## 時間の構成
 - 休憩時間
 - 作業時間
