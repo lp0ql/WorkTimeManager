@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定</title>
+</head>
+<body>
+    <button class="text" id='back'>戻る</button>
+    <br>
+    <br>
+    <div style="font-size: 2.5vmin;">※作業開始前の休憩時間は、メインの休憩時間の半分です。</div>
+    <label for="break">休憩時間（分）</label>
+    <input type="number" id='break' class="text">
+    <br>
+    <div style="font-size: 2.5vmin;">※作業時間は5分以下に設定できません。</div>
+    <label for="work">作業時間（分）</label>
+    <input type="number" id='work' class="text">
+    <br>
+    <label for="save">整理時間（分）</label>
+    <input type="number" id='save' class="text">
+   
+    <style>
+        body{
+            font-size: 5vmin;
+        }
+        .text{
+            font-size: 5vmin;
+        }
+    </style>
+
+    <script>
+        //設定済みの値を設定
+        function setDefault(data_type){
+            document.getElementById(data_type).value = Number(localStorage[data_type]) / 60
+        };
+
+        setDefault("break");
+        setDefault("work");
+        setDefault("save");
+
+        //イベントを設定
+        function setEvent(data_type){
+            document.getElementById(data_type).addEventListener("input",function(){
+                localStorage[data_type] = document.getElementById(data_type).value * 60;
+            })
+        };
+        setEvent("break");
+        setEvent("work");
+        setEvent("save");
+
+        //戻るボタンの設定
+        (function(){
+            document.getElementById("back").addEventListener("click",function(){
+                location.href = "./index.html";
+            });
+        })();
+
+    </script>
+</body>
+</html>

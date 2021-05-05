@@ -10,6 +10,7 @@
     <div id="counter">??:??</div>
     <div id="status">JavaScript待機中</div>
     <div id="reset">リセット</div>
+    <div id="settings">設定</div>
     <style>
         body{
             background-color: yellowgreen;
@@ -52,6 +53,22 @@
             background-color: rgb(127.5,127.5,127.5,0.5);
             opacity: 1;
         }
+        #settings{
+            position: fixed;
+            right: 1%;
+            bottom: 1%;
+            width: auto;
+            font-size: 4vmin;
+            border:solid 1px;
+            cursor: pointer;
+            padding: 0.5%;
+            background-color: rgb(127.5,127.5,127.5,0);
+            opacity: 0.5;
+        }
+        #settings:hover{
+            background-color: rgb(127.5,127.5,127.5,0.5);
+            opacity: 1;
+        }
     </style>
     <script>
         let time_settings = {
@@ -62,7 +79,17 @@
 
         function localStorageCheck(data_type){
             if(localStorage[data_type]){
-                time_settings[data_type] = Number(localStorage[data_type]);
+
+                if(data_type == "work"){//workの場合、5分以上に設定されているか確認
+                    if(Number(localStorage.work) > 5 * 60){//作業時間が5分以上の場合
+                        time_settings.work = Number(localStorage.work);//ローカル設定を適応
+                    }else{//５分以下の設定がされている場合
+                        time_settings.work = 5 * 60;//5分に設定
+                        localStorageCheck.work = time_settings.work;//ローカル設定を上書き
+                    }
+                }else{
+                    time_settings[data_type] = Number(localStorage[data_type]);//work以外なので無条件で設定
+                };
             }else{
                 localStorage[data_type] = String(time_settings[data_type]);
             };
@@ -177,7 +204,9 @@
                 save_time();
             });
             
-            coeFontStudio.play("work");
+            if(!time_settings.work == 0){
+                coeFontStudio.play("work");
+            };
         };
 
         function save_time(){
@@ -197,7 +226,9 @@
             counter(time_settings.save).then(() => {
                 end_break_time();
             });
-            coeFontStudio.play("save");
+            if(!time_settings.save == 0){
+                coeFontStudio.play("save");
+            };
         };
 
         function end_break_time(){
@@ -225,7 +256,9 @@
             
             counter(time_settings.break);
 
-            coeFontStudio.play("break");
+            if(!time_settings.break == 0){
+                coeFontStudio.play("break");
+            };
 
         };
 
@@ -253,39 +286,42 @@
         })();
 
 
-        //リセットの処理
-        (function(){
-            document.getElementById("reset").onclick = function(){
-                const reset_element = document.getElementById("reset");
-                reset_element.innerText = "トリプルクリックでリセット";
+        //ボタンの処理を設定
+        function set_button_process(element_id,button_process_title,button_action){
+            document.getElementById(element_id).onclick = function(){
+                const element = document.getElementById(element_id);
+                element.innerText = "トリプルクリックで" + button_process_title;
                 setTimeout(function(){
-                    reset_element.innerText = "リセット";
+                    element.innerText = button_process_title;
                 },5000);
 
-                if(reset_element.dataset.click && reset_element.dataset.click == "2"){
-                    delete localStorage.process;
-                    delete localStorage.start_date;
-                    window.location.reload();
+                if(element.dataset.click && element.dataset.click == "2"){
+                    button_action();
                 }else{
-                    var now = reset_element.dataset.click;
+                    var now = element.dataset.click;
                     if(!now){
                         now = "0";
                     };
                     now = Number(now) + 1;
-                    reset_element.dataset.click = String(now);
+                    element.dataset.click = String(now);
 
                     setTimeout(function(){
-                        reset_element.dataset.click = "0";
+                        element.dataset.click = "0";
                     },1000);
+                };
+            };
+        };
 
-                }
+        //リセットボタンの設定
+        set_button_process("reset","リセット",function(){
+            delete localStorage.process;
+            delete localStorage.start_date;
+            window.location.reload();
+        });
 
-            }
-        })()
-
-
-
-
+        set_button_process("settings","設定",function(){
+            location.href = "./settings.html";
+        });
 
     </script>
 </body>
