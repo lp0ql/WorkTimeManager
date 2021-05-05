@@ -105,6 +105,7 @@
                     min = add_zero(Math.round(min));
                     sec = add_zero(Math.round(sec));
                     elements.counter.innerText = min + " : " + sec;
+                    document.title = elements.counter.innerText + " 　" + elements.status.innerText;
                 };
 
                 function count(s){
