@@ -102,8 +102,8 @@
                         return num;
                     };
 
-                    min = add_zero(min);
-                    sec = add_zero(sec);
+                    min = add_zero(Math.round(min));
+                    sec = add_zero(Math.round(sec));
                     elements.counter.innerText = min + " : " + sec;
                 };
 
@@ -112,7 +112,7 @@
 
                     setTimeout(function(){
                         
-                        if(s == 0){
+                        if(s < 1){
                             resolve();
                         }else{
                             s--;
