@@ -149,13 +149,18 @@
                         elements.status.innerText = beforeText;
                     };
                 },5000);
-
             },
             play:function(voice_type){
                 coeFontStudio.audios[voice_type].play();
-                coeFontStudio.show();
             }
-        }
+        };
+
+        Object.keys(coeFontStudio.audios).forEach(audio_name => {//再生されたときにshowを実行
+            coeFontStudio.audios[audio_name].addEventListener("play",function(){
+                coeFontStudio.show();
+            });
+        });
+
 
         //カウントを開始
         function counter(s,func/*毎秒実行される。引数は残り秒数*/){
