@@ -73,6 +73,7 @@
     <script>
         let time_settings = {
             break:600,
+            work_ready:180,
             work:3000,
             save:300,
             autoReset:3600
@@ -97,6 +98,7 @@
         };
 
         localStorageCheck("break");
+        localStorageCheck("work_ready");
         localStorageCheck("work");
         localStorageCheck("save");
         localStorageCheck("autoReset");
@@ -134,6 +136,7 @@
         const coeFontStudio = {
             audios:{
                 work:new Audio("./voice/work.wav"),
+                work_ready:new Audio("./voice/work_ready.wav"),
                 save:new Audio("./voice/save.wav"),
                 break:new Audio("./voice/break.wav"),
             },
@@ -212,8 +215,33 @@
             elements.status.innerText = "休憩時間";
 
             counter(time_settings.break/2).then(() => {
-                main_time();
+                work_ready();
             })
+        };
+
+
+        function work_ready(){
+            localStorage.process = "work_ready";
+            elements.status.innerText = "準備時間";
+
+            document.body.animate([
+                {
+                    backgroundColor:"darkblue",
+                    color:"white"
+                }
+            ],{
+                duration:1000,
+                easing:"ease",
+                fill:"both"
+            });
+
+            counter(time_settings.work_ready).then(() => {
+                main_time();
+            });
+
+            if(!time_settings.work_ready == 0){
+                coeFontStudio.play("work_ready");
+            };
         };
 
         function main_time(){
@@ -300,6 +328,8 @@
 
             if(local_process == "main_time"){
                 main_time();
+            }else if(local_process == "work_ready"){
+                work_ready();
             }else if(local_process == "save_time"){
                 save_time();
             }else if(local_process == "end_break_time"){
